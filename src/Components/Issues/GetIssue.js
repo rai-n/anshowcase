@@ -6,6 +6,7 @@ import Accordion from "react-bootstrap/Accordion";
 import Row from "react-bootstrap/Row";
 import Container from "react-bootstrap/Container";
 import Col from "react-bootstrap/Col";
+import Posts from "./Post";
 import "../../issue.css";
 class LocalIssues extends Component {
   constructor(props) {
@@ -29,6 +30,29 @@ class LocalIssues extends Component {
       success.add(user["Success Criteria"]);
     });
 
+ 
+ 
+    const postsPerPage = 3;
+    let arrayForHoldingPosts = [];
+
+    const App = () => {
+      const [postsToShow, setPostsToShow] = useState([]);
+      const [next, setNext] = useState(3);
+    
+      const loopWithSlice = (start, end) => {
+        const slicedPosts = posts.slice(start, end);
+        arrayForHoldingPosts = [...arrayForHoldingPosts, ...slicedPosts];
+        setPostsToShow(arrayForHoldingPosts);
+      };
+
+      useEffect(() => {
+        loopWithSlice(0, postsPerPage);
+      }, []);
+    
+      const handleShowMorePosts = () => {
+        loopWithSlice(next, next + postsPerPage);
+        setNext(next + postsPerPage);
+      };  
  
     return (
       <div>
@@ -91,55 +115,9 @@ class LocalIssues extends Component {
       
         {issues.map((issue) => (
           <div>
-            <Card style={{ width: "18rem" }} className="container">
-              <ListGroup variant="flush">
-                <ListGroup.Item className="component">
-                  Summary: {issue.Summary}
-                </ListGroup.Item>
-                <ListGroup.Item className="component">
-                  Component: {issue.Component}
-                </ListGroup.Item>
-                <ListGroup.Item className="prior">
-                  Success Criteria: {issue["Success Criteria"]}
-                </ListGroup.Item>
-                <ListGroup.Item className="devices">
-                  Devices: {issue.Devices}
-                </ListGroup.Item>
-                <ListGroup.Item className="devices">
-                  State: {issue.state}
-                </ListGroup.Item>
-              </ListGroup>
-            </Card>{" "}
-            <Container>
-              <Row>
-                <Col></Col>
-                <Col>
-                  <br></br>
-                  <Accordion>
-                    <Accordion.Item>
-                      <Accordion.Header>View Recommendation</Accordion.Header>
-                      <Accordion.Body>
-                        {
-                          <div>
-                            <h2>What happened in {issue["Issue Id"]}</h2>
-                            <p>{issue.Description.split("##")[0]}}</p>
-                            <p>{issue.Description.split("##")[1]}}</p>
-                            <p>{issue.Description.split("##")[2]}}</p>
-                            <p>{issue.Description.split("##")[3]}}</p>
-                            <pre>
-                              <code class="language-html">
-                                <p>{issue.Description.split("##")[4]}}</p>
-                              </code>
-                            </pre>
-                          </div>
-                        }
-                      </Accordion.Body>
-                    </Accordion.Item>
-                  </Accordion>
-                </Col>
-                <Col></Col>
-              </Row>
+              <Post postsToRender={postsToShow}></Post>
               <br></br>  <br></br>  <br></br>  <br></br>  <br></br>
+              <button onClick={handleShowMorePosts}>Load more</button>
             </Container>
           </div>
         ))}
